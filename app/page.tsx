@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode, useEffect, useState } from 'react';
+import { divPlayer0, divPlayer1, divPlayer2, divPlayer3, divUnclaimed } from './utils/players';
 
 import Cell from './components/Cell';
 import { Nullable } from './utils/type';
@@ -10,15 +11,30 @@ function TickTacToe() {
   // Remember you can change this however you like, into different files, using different libraries etc. This is just a starting point.
 
   // this is a client component, so you can use react hooks here, .i.e.
-  const numberPlayers = 2;
 
+  const createCells = (numberPlayers: number): Nullable<number>[][]  => {
+    let result: Nullable<number>[][] = [];
+    for(let i = 0; i < numberPlayers + 1; i++) {
+        let innerArray: Nullable<number>[] = [];
+        for(let j = 0; j < numberPlayers + 1; j++) {
+            innerArray.push(null);
+        }
+        result.push(innerArray);
+    }
+    return result;
+  }
+
+  const [numberPlayers, setNumberPlayers] = useState<number>(2);
+  const [input, setInput] = useState<string>(numberPlayers.toString());
   const [player, setPlayer] = useState(0);
-  const [cells, setCells] = useState<Nullable<number>[][]>([[null, null, null], [null, null, null], [null, null, null]]);
+  const [cells, setCells] = useState<Nullable<number>[][]>(createCells(numberPlayers));
   const [winner, setWinner] = useState<Nullable<number>>(null);
 
   const nextPlayer = () => {
     setPlayer((player) => { return (player + 1) % numberPlayers });
   }
+
+
 
   const affectCell = (index: number) => {
     if(winner !== null) return;
@@ -41,6 +57,15 @@ function TickTacToe() {
     return render;
   }
 
+  const parseInput = (input: string) => {
+    const value = parseInt(input);
+    if (value && value > 1 && value < 5)
+    {
+      setNumberPlayers(value);
+      setPlayer(0);
+    }
+  }
+
   const checkWinner = (cells: Nullable<number>[][]): Nullable<number> => {
     for (let rowI = 0; rowI < cells.length; rowI++)
     {
@@ -49,45 +74,124 @@ function TickTacToe() {
       {
         const cell = row[columnI];
         if(cell == null) continue;
-        let same = true;
+        let check = 0;
         let checkColumnIndex = (columnI + 1) % row.length;
         // check horizontal
-        while(checkColumnIndex !== columnI && same)
+        while(checkColumnIndex !== columnI && check < 2)
         {
-          same = row[checkColumnIndex] == cell;
+          if(row[checkColumnIndex] == cell) check += 1;
           checkColumnIndex = (checkColumnIndex + 1) % row.length;
         }
-        if (same) return cell;
+        if (check == 2) return cell;
         // check vertical
-        same = true;
+        check = 0;
         let checkRowIndex = (rowI + 1) % cells.length;
-        while(checkRowIndex !== rowI && same)
+        while(checkRowIndex !== rowI && check < 2)
         {
-          same = cells[checkRowIndex][columnI] == cell;
+          if(cells[checkRowIndex][columnI] == cell) check += 1;
           checkRowIndex = (checkRowIndex + 1) % cells.length;
         }
-        if (same) return cell;
+        if (check == 2) return cell;
         // check diagonal
-        same = true;
+        check = 0;
         checkColumnIndex = (columnI + 1) % row.length;
         checkRowIndex = (rowI + 1) % cells.length;
-        while(checkRowIndex !== rowI && checkColumnIndex !== columnI && same)
+        while(checkRowIndex !== rowI && checkColumnIndex !== columnI && check < 2)
         {
-          same = cells[checkRowIndex][checkColumnIndex] == cell;
+          if(cells[checkRowIndex][checkColumnIndex] == cell) check += 1;
           checkRowIndex = (checkRowIndex + 1) % cells.length;
           checkColumnIndex = (checkColumnIndex + 1) % cells[checkRowIndex].length;
         }
-        if (same) return cell;
+        if (check == 2) return cell;
       }
     }
     return null;
   }
 
   useEffect(() => {
-    console.log(checkWinner(cells));
     setWinner(checkWinner(cells));
   }, [cells]);
 
+  useEffect(() => {
+    setCells(createCells(numberPlayers));
+  }, [numberPlayers]);
+
+  useEffect(() => {
+    parseInput(input);
+  }, [input])
+
+  // no time to create proper function
+  const displayLegend = (numberPlayer: number) => {
+    if (numberPlayer == 2)
+    {
+      return (
+        <>
+        <div className='flex gap-4'>
+            {divPlayer0}
+            <p>Player 1</p>
+          </div>
+          <div className='flex gap-4'>
+            {divPlayer1}
+            <p>Player 2</p>
+          </div>
+          <div className='flex gap-4'>
+            {divUnclaimed}
+            <p>Unclaimed</p>
+          </div>
+          </>
+      )
+    }
+    if (numberPlayer == 3)
+      {
+        return (
+          <>
+          <div className='flex gap-4'>
+              {divPlayer0}
+              <p>Player 1</p>
+            </div>
+            <div className='flex gap-4'>
+              {divPlayer1}
+              <p>Player 2</p>
+            </div>
+            <div className='flex gap-4'>
+              {divPlayer2}
+              <p>Player 3</p>
+            </div>
+            <div className='flex gap-4'>
+              {divUnclaimed}
+              <p>Unclaimed</p>
+            </div>
+            </>
+        )
+      }
+      if (numberPlayer == 4)
+        {
+          return (
+            <>
+            <div className='flex gap-4'>
+                {divPlayer0}
+                <p>Player 1</p>
+              </div>
+              <div className='flex gap-4'>
+                {divPlayer1}
+                <p>Player 2</p>
+              </div>
+              <div className='flex gap-4'>
+                {divPlayer2}
+                <p>Player 3</p>
+              </div>
+              <div className='flex gap-4'>
+                {divPlayer3}
+                <p>Player 4</p>
+              </div>
+              <div className='flex gap-4'>
+                {divUnclaimed}
+                <p>Unclaimed</p>
+              </div>
+              </>
+          )
+        }
+  }
 
   return (
     <div className='h-screen w-screen bg-beige-3 '>
@@ -103,18 +207,10 @@ function TickTacToe() {
 
         {/* Legend */}
         <div className='w-auto'>
-          <div className='flex gap-4'>
-            <div className='w-[60px] h-[60px] border-[16px] rounded-full border-purple-5' />
-            <p>Player 1</p>
+        <div className='flex gap-4'>
+            <input placeholder='Enter number of player' onChange={(event) => setInput(event.target.value)} value={input}></input>
           </div>
-          <div className='flex gap-4'>
-            <div className='w-[60px] h-[60px] border-[16px] border-green-3' />
-            <p>Player 2</p>
-          </div>
-          <div className='flex gap-4'>
-            <div className='w-[60px] h-[60px] rounded bg-beige-2' />
-            <p>Unclaimed</p>
-          </div>
+          {displayLegend(numberPlayers)}
         </div>
 
 
