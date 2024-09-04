@@ -75,32 +75,57 @@ function TickTacToe() {
         const cell = row[columnI];
         if(cell == null) continue;
         let check = 0;
-        let checkColumnIndex = (columnI + 1) % row.length;
+        let checkColumnIndex = columnI + 1;
         // check horizontal
         while(checkColumnIndex !== columnI && check < 2)
         {
-          if(row[checkColumnIndex] == cell) check += 1;
-          checkColumnIndex = (checkColumnIndex + 1) % row.length;
+          // do not continue to the other border
+          if(checkColumnIndex >= row.length) break;
+          if(row[checkColumnIndex] !== cell) break;
+          check += 1;
+          checkColumnIndex = checkColumnIndex + 1;
         }
         if (check == 2) return cell;
         // check vertical
         check = 0;
-        let checkRowIndex = (rowI + 1) % cells.length;
+        let checkRowIndex = rowI + 1;
         while(checkRowIndex !== rowI && check < 2)
         {
-          if(cells[checkRowIndex][columnI] == cell) check += 1;
-          checkRowIndex = (checkRowIndex + 1) % cells.length;
+          // do not continue to the other border
+          if(checkRowIndex >= cells.length) break;
+          if(cells[checkRowIndex][columnI] !== cell) break;
+          check += 1;
+          checkRowIndex = checkRowIndex + 1
+
         }
         if (check == 2) return cell;
-        // check diagonal
+        // check diagonal descending
         check = 0;
-        checkColumnIndex = (columnI + 1) % row.length;
-        checkRowIndex = (rowI + 1) % cells.length;
+        checkColumnIndex = columnI + 1;
+        checkRowIndex = rowI + 1;
         while(checkRowIndex !== rowI && checkColumnIndex !== columnI && check < 2)
         {
-          if(cells[checkRowIndex][checkColumnIndex] == cell) check += 1;
-          checkRowIndex = (checkRowIndex + 1) % cells.length;
-          checkColumnIndex = (checkColumnIndex + 1) % cells[checkRowIndex].length;
+          // do not continue to the other border
+          if (checkColumnIndex >= row.length || checkRowIndex >= cells.length) break;
+          if(cells[checkRowIndex][checkColumnIndex] !== cell) break;
+          check += 1;
+          checkRowIndex = checkRowIndex + 1;
+          checkColumnIndex = checkColumnIndex + 1;
+
+        }
+        if (check == 2) return cell;
+        // check diagonal ascending
+        check = 0;
+        checkColumnIndex = columnI + 1;
+        checkRowIndex = rowI - 1
+        while(checkRowIndex !== rowI && checkColumnIndex !== columnI && check < 2)
+        {
+          // do not continue to the other border
+          if (checkColumnIndex >= row.length || checkRowIndex >= cells.length || checkRowIndex < 0) break;
+          if(cells[checkRowIndex][checkColumnIndex] !== cell) break;
+          check += 1;
+          checkRowIndex = checkRowIndex - 1;
+          checkColumnIndex = checkColumnIndex + 1;
         }
         if (check == 2) return cell;
       }
