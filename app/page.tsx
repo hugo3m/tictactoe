@@ -207,6 +207,7 @@ function TickTacToe() {
 
         {/* Legend */}
         <div className='w-auto'>
+        <span>Number of players from 2 to 4</span>
         <div className='flex gap-4'>
             <input placeholder='Enter number of player' onChange={(event) => setInput(event.target.value)} value={input}></input>
           </div>
